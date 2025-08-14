@@ -1,0 +1,137 @@
+mysql> use shop;
+Database changed
+
+mysql> CREATE TABLE customer (
+    ->   customer_id INT PRIMARY KEY,
+    ->   customer_name VARCHAR(100) NOT NULL,
+    ->   city VARCHAR(100),
+    ->   email VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE product (
+    ->   product_id INT PRIMARY KEY,
+    ->   product_name VARCHAR(100) NOT NULL,
+    ->   category VARCHAR(100),
+    ->   price DECIMAL(10, 2) NOT NULL
+    ->   );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE sale (
+    ->   sale_id INT PRIMARY KEY,
+    ->   customer_id INT NOT NULL,
+    ->   product_id INT NOT NULL,
+    ->   quantity INT NOT NULL,
+    ->   sale_date DATE,
+    ->   total_amount INT);
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> ALTER TABLE sale
+    -> ADD CONSTRAINT fk_sale_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id);
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE sale
+    -> ADD CONSTRAINT fk_sale_product FOREIGN KEY (product_id) REFERENCES product(product_id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc sale;
++--------------+------+------+-----+---------+-------+
+| Field        | Type | Null | Key | Default | Extra |
++--------------+------+------+-----+---------+-------+
+| sale_id      | int  | NO   | PRI | NULL    |       |
+| customer_id  | int  | NO   | MUL | NULL    |       |
+| product_id   | int  | NO   | MUL | NULL    |       |
+| quantity     | int  | NO   |     | NULL    |       |
+| sale_date    | date | YES  |     | NULL    |       |
+| total_amount | int  | YES  |     | NULL    |       |
++--------------+------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc product;
++--------------+---------------+------+-----+---------+-------+
+| Field        | Type          | Null | Key | Default | Extra |
++--------------+---------------+------+-----+---------+-------+
+| product_id   | int           | NO   | PRI | NULL    |       |
+| product_name | varchar(100)  | NO   |     | NULL    |       |
+| category     | varchar(100)  | YES  |     | NULL    |       |
+| price        | decimal(10,2) | NO   |     | NULL    |       |
++--------------+---------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc customer;
++---------------+--------------+------+-----+---------+-------+
+| Field         | Type         | Null | Key | Default | Extra |
++---------------+--------------+------+-----+---------+-------+
+| customer_id   | int          | NO   | PRI | NULL    |       |
+| customer_name | varchar(100) | NO   |     | NULL    |       |
+| city          | varchar(100) | YES  |     | NULL    |       |
+| email         | varchar(100) | YES  |     | NULL    |       |
++---------------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> INSERT INTO customer (customer_id, customer_name, city, email) VALUES
+    -> (1, 'Karan', 'Nagpur', 'karan@mail.com'),
+    -> (2, 'Neha', 'Bhopal', 'neha@mail.com'),
+    -> (3, 'Sahil', 'Jaipur', 'sahil@mail.com');
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO product (product_id, product_name, category, price) VALUES
+    -> (201, 'Laptop Bag', 'Accessories', 800.00),
+    -> (202, 'Smart Watch', 'Electronics', 2500.00),
+    -> (203, 'Water Bottle', 'Kitchen', 200.00);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from product;
++------------+----------------+-------------+---------+
+| product_id | product_name   | category    | price   |
++------------+----------------+-------------+---------+
+|         201 | Laptop Bag     | Accessories |  800.00 |
+|         202 | Smart Watch    | Electronics | 2500.00 |
+|         203 | Water Bottle   | Kitchen     |  200.00 |
++------------+----------------+-------------+---------+
+3 rows in set (0.00 sec)
+
+mysql> select * from sale;
+Empty set (0.00 sec)
+
+mysql> select * from customer;
++-------------+---------------+---------+-----------------+
+| customer_id | customer_name | city    | email           |
++-------------+---------------+---------+-----------------+
+|            1 | Karan         | Nagpur  | karan@mail.com  |
+|            2 | Neha          | Bhopal  | neha@mail.com   |
+|            3 | Sahil         | Jaipur  | sahil@mail.com  |
++-------------+---------------+---------+-----------------+
+3 rows in set (0.00 sec)
+
+mysql> INSERT INTO sale (sale_id, customer_id, product_id, quantity, sale_date, total_amount) VALUES
+    -> (11, 1, 201, 3, '2025-07-15', 2400),
+    -> (12, 2, 202, 1, '2025-07-16', 2500),
+    -> (13, 3, 203, 5, '2025-07-17', 1000);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from sale;
++---------+-------------+------------+----------+------------+--------------+
+| sale_id | customer_id | product_id | quantity | sale_date  | total_amount |
++---------+-------------+------------+----------+------------+--------------+
+|       11 |            1 |         201 |         3 | 2025-07-15 |          2400 |
+|       12 |            2 |         202 |         1 | 2025-07-16 |          2500 |
+|       13 |            3 |         203 |         5 | 2025-07-17 |          1000 |
++---------+-------------+------------+----------+------------+--------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT DISTINCT customer_id
+    -> FROM sale
+    -> WHERE total_amount > (SELECT AVG(total_amount) FROM sale);
++-------------+
+| customer_id |
++-------------+
+|            1 |
+|            2 |
++-------------+
+2 rows in set (0.00 sec)
