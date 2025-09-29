@@ -1,0 +1,231 @@
+Microsoft Windows [Version 10.0.19045.6332]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Program Files\MySQL\MySQL Server 9.3\bin>mysql -h localhost -u root -p
+Enter password: ****
+Welcome to the MySQL monitor. Commands end with ; or \g.
+Your MySQL connection id is 11
+Server version: 9.4.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use switch;
+Database changed
+mysql> desc product;
++-------+-------------+------+-----+---------+-------+
+| Field | Type | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| pid | int | YES | | NULL | |
+| pname | varchar(20) | YES | | NULL | |
+| price | int | YES | | NULL | |
++-------+-------------+------+-----+---------+-------+
+3 rows in set (0.426 sec)
+
+mysql> select* from product;
++------+--------+-------+
+| pid | pname | price |
++------+--------+-------+
+| 101 | book | 345 |
+
+| 102 | pencil | 45 |
++------+--------+-------+
+2 rows in set (0.064 sec)
+
+mysql> select* from product;
++------+--------+-------+
+| pid | pname | price |
++------+--------+-------+
+| 101 | book | 345 |
+| 102 | pencil | 45 |
+| 103 | rubber | 10 |
++------+--------+-------+
+3 rows in set (0.006 sec)
+
+mysql> desc product;
++-------+-------------+------+-----+---------+-------+
+| Field | Type | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| pid | int | YES | | NULL | |
+| pname | varchar(20) | YES | | NULL | |
+| price | int | YES | | NULL | |
++-------+-------------+------+-----+---------+-------+
+3 rows in set (0.014 sec)
+
+mysql> desc product;
++-------+-------------+------+-----+---------+-------+
+| Field | Type | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| pid | int | YES | | NULL | |
+| pname | varchar(20) | YES | | NULL | |
+| price | int | YES | | NULL | |
++-------+-------------+------+-----+---------+-------+
+3 rows in set (0.011 sec)
+
+mysql> use switch;
+package ddd;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class abc {
+
+Connection con;
+Statement stm;
+Scanner s;
+
+public abc() {
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+con = DriverManager.getConnection("jdbc:mysql://localhost:3306/switch", "root", "root");
+stm = con.createStatement();
+s = new Scanner(System.in);
+createTable();
+} catch (Exception e) {
+e.printStackTrace();
+}
+}
+
+public void createTable() throws SQLException {
+String sql = "create table product (" +
+"pid int primary key, " +
+"pname varchar(20), " +
+"price int)";
+stm.executeUpdate(sql);
+System.out.println("Table created or already exists.");
+}
+
+public void insertRecord() {
+try {
+System.out.print("Enter Product ID: ");
+int pid = s.nextInt();
+s.nextLine();
+System.out.print("Enter Product Name: ");
+String pname = s.nextLine();
+
+System.out.print("Enter Price: ");
+int price = s.nextInt();
+String sql = "INSERT INTO product (pid, pname, price) VALUES (?, ?, ?)";
+PreparedStatement pstmt = con.prepareStatement(sql);
+pstmt.setInt(1, pid);
+pstmt.setString(2, pname);
+pstmt.setInt(3, price);
+int rows = pstmt.executeUpdate();
+System.out.println(rows + " record(s) inserted.");
+pstmt.close();
+} catch (SQLException e) {
+System.out.println("Insert error: " + e.getMessage());
+}
+}
+
+public void updateRecord() {
+try {
+System.out.print("Enter Product ID to update: ");
+int pid = s.nextInt();
+s.nextLine();
+System.out.print("Enter new Product Name: ");
+String pname = s.nextLine();
+System.out.print("Enter new Price: ");
+int price = s.nextInt();
+String sql = "UPDATE product SET pname = ?, price = ? WHERE pid = ?";
+PreparedStatement pstmt = con.prepareStatement(sql);
+pstmt.setString(1, pname);
+pstmt.setInt(2, price);
+pstmt.setInt(3, pid);
+int rows = pstmt.executeUpdate();
+if (rows > 0) {
+System.out.println("Record updated successfully.");
+} else {
+System.out.println("Product ID not found.");
+}
+pstmt.close();
+} catch (SQLException e) {
+System.out.println("Update error: " + e.getMessage());
+}
+}
+
+public void deleteRecord() {
+try {
+System.out.print("Enter Product ID to delete: ");
+int pid = s.nextInt();
+String sql = "DELETE FROM product WHERE pid = ?";
+PreparedStatement pstmt = con.prepareStatement(sql);
+pstmt.setInt(1, pid);
+int rows = pstmt.executeUpdate();
+if (rows > 0) {
+System.out.println("Record deleted successfully.");
+} else {
+System.out.println("Product ID not found.");
+}
+pstmt.close();
+} catch (SQLException e) {
+System.out.println("Delete error: " + e.getMessage());
+}
+}
+
+public void displayRecords() {
+try {
+String sql = "SELECT * FROM product";
+ResultSet rs = stm.executeQuery(sql);
+System.out.println("\nProduct Table:");
+System.out.println("PID\tName\tPrice");
+System.out.println("--------------------------");
+boolean hasRecords = false;
+while (rs.next()) {
+hasRecords = true;
+int pid = rs.getInt("pid");
+String pname = rs.getString("pname");
+int price = rs.getInt("price");
+System.out.println(pid + "\t" + pname + "\t" + price);
+}
+if (!hasRecords) {
+System.out.println("No records found.");
+}
+rs.close();
+} catch (SQLException e) {
+
+System.out.println("Display error: " + e.getMessage());
+}
+}
+public void menu() {
+int choice;
+do {
+System.out.println("\n--- MENU ---");
+System.out.println("1. Insert");
+System.out.println("2. Update");
+System.out.println("3. Delete");
+System.out.println("4. Display");
+System.out.println("5. Exit");
+System.out.print("Enter your choice: ");
+choice = s.nextInt();
+switch (choice) {
+case 1:
+insertRecord();
+break;
+case 2:
+updateRecord();
+break;
+case 3:
+deleteRecord();
+break;
+case 4:
+displayRecords();
+break;
+case 5:
+System.out.println("Exiting program...");
+break;
+default:
+System.out.println("Invalid choice. Please try again.");
+}
+} while (choice != 5);
+}
+public static void main(String[] args) {
+abc app = new abc();
+app.menu();
+}
+}
