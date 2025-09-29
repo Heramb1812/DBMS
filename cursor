@@ -1,0 +1,184 @@
+PRACTICAL NO.6
+•	Simple Cursor :
+declare
+eid int;
+en varchar(20);
+sal float;
+dept varchar(20);
+nm varchar(20);
+cursor c1 is select * from employe;
+begin
+open c1;
+loop
+fetch c1 into eid,en,sal,dept;
+exit when c1%notfound;
+dbms_output.put_line(eid || en || sal || dept);
+end loop;
+close c1;
+end;
+/
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Fri Sep 26 13:49:29 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Fri Sep 26 2025 13:48:50 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> create table employe (eid int primary key, en varchar2(20), sal float, dept varchar2(20));
+
+Table created.
+
+SQL> insert into employe values (201, 'arjun', 48000, 'finance');
+
+1 row created.
+
+SQL> insert into employe values (202, 'sneha', 55000, 'hr');
+
+1 row created.
+
+SQL> insert into employe values (203, 'neha', 60000, 'marketing');
+
+1 row created.
+
+SQL> insert into employe values (205, 'pooja', 47000, 'sales');
+
+1 row created.
+
+SQL> select * from employe;
+
+       EID EN                          SAL DEPT
+---------- -------------------- ---------- --------------------
+       201 arjun                     48000 finance
+       202 sneha                     55000 hr
+       203 neha                      60000 marketing
+       205 pooja                     47000 sales
+
+SQL> set serveroutput on;
+SQL> @C:\Users\System05\Desktop\New folder\Cursor1.sql
+SP2-0310: unable to open file "C:\Users\System05\Desktop\New.sql"
+SQL> @"C:\Users\System05\Desktop\New folder\Cursor1.sql"
+201arjun48000finance
+202sneha55000hr
+203neha60000marketing
+205pooja47000sales
+
+PL/SQL procedure successfully completed.
+
+
+
+•	Parameterised Cursor :
+declare
+  eid int;
+  en varchar2(20);
+  sal float;
+  dept varchar2(20);
+  nm varchar2(20) := 'it';
+  cursor c1(p_dept varchar2) is
+    select eid, en, sal, dept
+    from employee
+    where dept = p_dept;
+begin
+  open c1(nm);
+  loop
+    fetch c1 into eid, en, sal, dept;
+    exit when c1%notfound;
+    dbms_output.put_line('eid: ' || to_char(eid) || ', en: ' || en || ', sal: ' || to_char(sal) || ', dept: ' || dept);
+  end loop;
+  close c1;
+end;
+/
+SQL> set serveroutput on;
+SQL> @"C:\Users\System05\Desktop\New folder\ParameterisedCursor.sql"
+
+PL/SQL procedure successfully completed.
+
+•	Update and Delete Cursor :
+declare 
+  empid int;
+  empname varchar(20);
+  empsal float;
+  dept varchar(20);
+  cursor c1 is 
+    select * from employee1 where empsal < 50000 for update;
+begin
+  open c1;
+  loop
+    fetch c1 into empid,empname,empsal,dept;
+exit when c1%NOTFOUND; 
+    dbms_output.put_line(empid || '    ' || empname || '    ' || empsal||'    '||dept);
+    delete from employee1 where current of c1;
+  end loop;
+  close c1;
+end;
+/
+
+SQL> create table employee1 (empid int ,empname varchar(20),empsal float(20), dept varchar(30));
+
+Table created.
+
+SQL> insert into employee1 values (101,'mohit',40000,'computer');
+
+1 row created.
+
+SQL> insert into employee1 values (102,'mahi',30000,'IT');
+
+1 row created.
+
+SQL> insert into employee1 values (103,'Sai',20000,'AIDS');
+
+1 row created.
+
+SQL> insert into employee1 values (104,'Shraddha',100000,'DS');
+
+1 row created.
+
+SQL> select * from employee1;
+
+     EMPID EMPNAME                  EMPSAL DEPT
+---------- -------------------- ---------- ------------------------------
+       101 mohit                     40000 computer
+       102 mahi                      30000 IT
+       103 Sai                       20000 AIDS
+       104 Shraddha                 100000 DS
+
+SQL> @"C:\Users\System05\Desktop\New folder\UDCursor.sql"
+101    mohit    40000    computer
+102    mahi    30000    IT
+103    Sai    20000    AIDS
+
+PL/SQL procedure successfully completed.
+
+•	FOR Loop Cursor :
+declare
+rec employee1%rowtype;
+cursor c1 is select * from employee1 FOR UPDATE; 
+avg_sal float;
+begin
+select avg(empsal) into avg_sal from employee1;
+for rec in c1 loop
+if rec.empsal < avg_sal then
+UPDATE employee1 set empsal = empsal + 500 
+where current of c1;
+end if;
+end loop;
+end;
+/
+
+SQL> set serveroutput on;
+SQL> @"C:\Users\System05\Desktop\New folder\ForLoopCursor.sql"
+
+PL/SQL procedure successfully completed.
+
+SQL> select empid, empname, empsal, dept from employee1;
+
+     EMPID EMPNAME                  EMPSAL DEPT
+---------- -------------------- ---------- ------------------------------
+       104 Shraddha                 100000 DS
+
