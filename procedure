@@ -1,0 +1,175 @@
+PRACTICAL NO.5
+•	Create Procedure :
+create or replace procedure proce_grad(r in number,m in number,gr out varchar)
+is
+begin
+if m<=1500 and m>=900 then
+gr:='dst with dist';
+elsif m<=989 and m>=900 then
+gr:='ist class';
+elsif m<=899 and m>=825 then
+gr:='iind class';
+else
+gr:='fail';
+end if;
+end;
+/
+
+•	Call Procedure :
+declare
+r number;
+m number;
+gr varchar(20);
+nm varchar(100);
+begin
+r:=&r;
+select rno,name,total_marks into r,nm,m from result1 where rno=r;
+proce_grad(r,m,gr);
+dbms_output.put_line(r||'    '||m||'    '||gr);
+end;
+/
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Thu Sep 25 14:05:38 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Fri Sep 19 2025 14:27:24 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> create table Student_marks(sname varchar(100), class varchar(20));
+
+Table created.
+
+SQL> insert into Student_marks values('Shraddha',20);
+
+1 row created.
+
+SQL> insert into Student_marks values('siya',12);
+
+1 row created.
+
+SQL> insert into Student_marks values('Sai',30);
+
+1 row created.
+
+SQL> select * from Student_marks;
+
+SNAME
+--------------------------------------------------------------------------------
+CLASS
+--------------------
+Shraddha
+20
+
+siya
+12
+
+Sai
+30
+
+
+SQL> select * from Student_marks;
+
+SNAME
+--------------------------------------------------------------------------------
+CLASS
+--------------------
+Shraddha
+20
+
+siya
+12
+
+Sai
+30
+
+SQL> create table result1(rno int,Name varchar(60), total_marks int);
+
+Table created.
+
+SQL> insert into result1 values(101,'ram',500);
+
+1 row created.
+
+SQL> insert into result1 values(102,'radhika',400);
+
+1 row created.
+
+SQL> insert into result1 values(103,'Sairam',600);
+
+1 row created.
+
+SQL> insert into result1 values(104,'Sita',700);
+
+1 row created.
+
+SQL> insert into result1 values(105,'Nayan',900);
+
+1 row created.
+
+SQL> select * from result1;
+
+       RNO NAME
+---------- ------------------------------------------------------------
+TOTAL_MARKS
+-----------
+       101 ram
+        500
+
+       102 radhika
+        400
+
+       103 Sairam
+        600
+
+       RNO NAME
+---------- ------------------------------------------------------------
+TOTAL_MARKS
+-----------
+       104 Sita
+        700
+
+       105 Nayan
+        900
+SQL> set serveroutput on
+SQL> @"C:\Users\System05\Desktop\New folder\CProcedure.sql"
+
+Procedure created.
+
+SQL> @"C:\Users\System05\Desktop\New folder\CallProcedure.sql"
+Enter value for r: 101
+old   7: r:=&r;
+new   7: r:=101;
+101    500    fail
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\System05\Desktop\New folder\CallProcedure.sql"
+Enter value for r: 105
+old   7: r:=&r;
+new   7: r:=105;
+105    900    dst with dist
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\System05\Desktop\New folder\CallProcedure.sql"
+Enter value for r: 104
+old   7: r:=&r;
+new   7: r:=104;
+104    700    fail
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\System05\Desktop\New folder\CallProcedure.sql"
+Enter value for r: 103
+old   7: r:=&r;
+new   7: r:=103;
+103    600    fail
+
+PL/SQL procedure successfully completed.
