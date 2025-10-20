@@ -1,0 +1,61 @@
+Insert data:
+from pymongo import MongoClient
+
+conn = MongoClient("mongodb://localhost:27017/")
+
+db = conn["test"]              
+collection = db["pr12"]        
+
+new_record = {
+    "pid": 103,
+    "cname": "New Product",
+    "price": 749.50
+}
+result = collection.insert_one(new_record)
+
+print(f"New record inserted with _id: {result.inserted_id}")
+New record inserted with _id: 68ee01c32cccffbe76ca8a97
+Print Data:
+from pymongo import MongoClient
+
+conn = MongoClient("mongodb://localhost:27017/")
+db = conn["test"]              
+collection = db["pr12"]       
+record = collection.find_one({"pid": 102})
+if record:
+    print("Record found:")
+    print(record)
+else:
+    print("No record found with pid = 101.")
+
+Record found:
+{'_id': ObjectId('68edff8661d7ac938acebea4'), 'pid': 102, 'cname': 'Eraser', 'price': 30}
+
+Update:
+from pymongo import MongoClient
+conn = MongoClient("mongodb://localhost:27017/")
+db = conn["test"]              
+collection = db["pr12"]         
+collection.update_one(
+    {"pid": 102},               
+    {"$set": {"price": 599.99}} #
+)
+
+updated_record = collection.find_one({"pid": 102})
+print("Updated Record:")
+print(updated_record)
+Updated Record:
+{'_id': ObjectId('68edff8661d7ac938acebea4'), 'pid': 102, 'cname': 'Eraser', 'price': 599.99}
+Delete Record:
+from pymongo import MongoClient
+
+conn = MongoClient("mongodb://localhost:27017/")
+
+db = conn["test"]               
+collection = db["pr12"]         
+result = collection.delete_one({"pid": 101})
+if result.deleted_count > 0:
+    print("Record deleted successfully.")
+else:
+    print("No matching record found to delete.")
+New record inserted with _id: 68ee01c32cccffbe76ca8a97
